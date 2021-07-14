@@ -58,11 +58,11 @@ $.appId = 10028;
   $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
   await requestAlgo();
   await $.wait(1000)
-  let res = await getAuthorShareCode('')
+  let res = await getAuthorShareCode('https://raw.githubusercontent.com/Aaron-lv/updateTeam/master/shareCodes/cfd.json')
   if (!res) {
-    $.http.get({url: ''}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
+    $.http.get({url: 'https://purge.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json'}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
     await $.wait(1000)
-    res = await getAuthorShareCode('')
+    res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json')
   }
   $.strMyShareIds = [...(res && res.shareId || [])]
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -150,14 +150,23 @@ async function cfd() {
     //卖贝壳
     await $.wait(2000)
     await querystorageroom()
-  
-    //倒垃圾
-    // await $.wait(2000)
-    // await queryRubbishInfo()
 
     //每日任务领奖
     await $.wait(2000)
     await getActTask()
+
+    //升级建筑
+    await $.wait(2000)
+    for(let key of Object.keys($.info.buildInfo.buildList)) {
+      let vo = $.info.buildInfo.buildList[key]
+      let body = `strBuildIndex=${vo.strBuildIndex}`
+      await getBuildInfo(body, vo.strBuildIndex)
+      await $.wait(1000)
+    }
+
+    //倒垃圾
+    await $.wait(2000)
+    await queryRubbishInfo()
 
     //雇导游
     await $.wait(2000);
@@ -176,15 +185,7 @@ async function cfd() {
     await $.wait(2000);
     await browserTask(1);
 
-    //建筑升级
-    await $.wait(2000)
-    for(let key of Object.keys($.info.buildInfo.buildList)) {
-      let vo = $.info.buildInfo.buildList[key]
-      let body = `strBuildIndex=${vo.strBuildIndex}`
-      await getBuildInfo(body, vo.strBuildIndex)
-      await $.wait(1000)
-    }
-
+    await $.wait(2000);
     const endInfo = await getUserInfo(false);
     $.result.push(
         `【京东账号${$.index}】${$.nickName || $.UserName}`,
@@ -252,9 +253,9 @@ function sellgoods(body) {
         } else {
           data = JSON.parse(data);
           if (data.iRet === 0) {
-            console.log(`贝壳出售成功：获得${data.Data.ddwCoin}金币、${data.Data.ddwMoney}财富\n`)
+            console.log(`贝壳出售成功：获得${data.Data.ddwCoin}金币 ${data.Data.ddwMoney}财富\n`)
           } else {
-            console.log(`贝壳出售失败\n`)
+            console.log(`贝壳出售失败：${data.sErrMsg}\n`)
           }
         }
       } catch (e) {
@@ -348,15 +349,16 @@ function rewardSign(body) {
           data = JSON.parse(data);
           if (data.iRet === 0 || data.sErrMsg === "success") {
             if (data.Data.ddwCoin) {
-              console.log(`签到成功，获得${data.Data.ddwCoin}金币\n`)
+              console.log(`签到成功：获得${data.Data.ddwCoin}金币\n`)
             } else if (data.Data.ddwMoney) {
-              console.log(`签到成功，获得${data.Data.ddwMoney}财富\n`)
+              console.log(`签到成功：获得${data.Data.ddwMoney}财富\n`)
             } else if (data.Data.strPrizeName) {
-              console.log(`签到成功，获得${data.Data.strPrizeName}\n`)
+              console.log(`签到成功：获得${data.Data.strPrizeName}\n`)
+            } else {
+              console.log(`签到成功：很遗憾未中奖~\n`)
             }
           } else {
-            console.log(`签到失败\n`)
-            console.log(data.sErrMsg)
+            console.log(`签到失败：${data.sErrMsg}\n`)
           }
         }
       } catch (e) {
@@ -377,10 +379,9 @@ function helpdraw(dwUserId) {
         } else {
           data = JSON.parse(data);
           if (data.iRet === 0 || data.sErrMsg === "success") {
-            console.log(`领取助力奖励成功，获得${data.Data.ddwCoin}金币`)
+            console.log(`领取助力奖励成功：获得${data.Data.ddwCoin}金币`)
           } else {
-            console.log(`领取助力奖励失败`)
-            console.log(data.sErrMsg)
+            console.log(`领取助力奖励失败：${data.sErrMsg}`)
           }
         }
       } catch (e) {
@@ -402,16 +403,23 @@ async function queryRubbishInfo() {
           console.log(`${$.name} QueryRubbishInfo API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
+          console.log(`倒垃圾`)
           if (data.Data.StoryInfo.StoryList.length === 0) {
-            console.log(`暂时没有垃圾`)
+            console.log(`暂时没有垃圾\n`)
           } else {
             console.log(`获取到垃圾信息，开始倒垃圾`)
+            await $.wait(2000)
             let rubbishOperRes = await rubbishOper('1')
-            let RubbishList = rubbishOperRes.Data.ThrowRubbish.Game.RubbishList
-            for(let key of Object.keys(RubbishList)) {
-              let vo = RubbishList[key]
-              await rubbishOper('2', `dwRubbishId=${vo.dwId}`)
-              await $.wait(1000)
+            for(let key of Object.keys(rubbishOperRes.Data.ThrowRubbish.Game.RubbishList)) {
+              let vo = rubbishOperRes.Data.ThrowRubbish.Game.RubbishList[key]
+              await $.wait(2000)
+              var rubbishOperTwoRes = await rubbishOper('2', `dwRubbishId=${vo.dwId}`)
+            }
+            if (rubbishOperTwoRes.iRet === 0) {
+              let AllRubbish = rubbishOperTwoRes.Data.RubbishGame.AllRubbish
+              console.log(`倒垃圾成功：获得${AllRubbish.ddwCoin}金币 ${AllRubbish.ddwMoney}财富\n`)
+            } else {
+              console.log(`倒垃圾失败：${rubbishOperTwoRes.sErrMsg}\n`)
             }
           }
         }
@@ -427,7 +435,7 @@ function rubbishOper(dwType, body = '') {
   return new Promise((resolve) => {
     switch(dwType) {
       case '1':
-        $.get(taskUrl(`story/RubbishOper`, `dwType=1&dwRewardType=0&${body}`), (err, resp, data) => {
+        $.get(taskUrl(`story/RubbishOper`, `dwType=1&dwRewardType=0`), (err, resp, data) => {
           try {
             if (err) {
               console.log(`${JSON.stringify(err)}`)
@@ -443,19 +451,18 @@ function rubbishOper(dwType, body = '') {
         })
         break
       case '2':
-        $.get(taskUrl(`story/RubbishOper`, `dwType=2&dwRewardType=0${body}`), (err, resp, data) => {
+        $.get(taskUrl(`story/RubbishOper`, `dwType=2&dwRewardType=0&${body}`), (err, resp, data) => {
           try {
             if (err) {
               console.log(`${JSON.stringify(err)}`)
               console.log(`${$.name} RubbishOper API请求失败，请检查网路重试`)
             } else {
               data = JSON.parse(data);
-              console.log(data)
             }
           } catch (e) {
             $.logErr(e, resp);
           } finally {
-            resolve();
+            resolve(data);
           }
         })
         break
@@ -579,7 +586,11 @@ function employTourGuide(body, buildNmae) {
           console.log(`${$.name} EmployTourGuide API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
-          if (data.iRet === 0) console.log(`【${buildNmae}】雇佣导游成功`)
+          if (data.iRet === 0) {
+            console.log(`【${buildNmae}】雇佣导游成功`)
+          } else {
+            console.log(`【${buildNmae}】导游下班了~`)
+          }
         }
       } catch (e) {
         $.logErr(e, resp);
@@ -590,8 +601,9 @@ function employTourGuide(body, buildNmae) {
   })
 }
 
-// 建筑升级
-async function getBuildInfo(body, strBuildIndex) {
+// 升级建筑
+async function getBuildInfo(body, strBuildIndex, type = true) {
+  let twobody = body
   return new Promise(async (resolve) => {
     $.get(taskUrl(`user/GetBuildInfo`, body), async (err, resp, data) => {
       try {
@@ -600,48 +612,59 @@ async function getBuildInfo(body, strBuildIndex) {
           console.log(`${$.name} GetBuildInfo API请求失败，请检查网路重试`)
         } else {
           data = JSON.parse(data);
-          let buildNmae;
-          switch(strBuildIndex) {
-            case 'food':
-              buildNmae = '京喜美食城'
-              break
-            case 'sea':
-              buildNmae = '京喜旅馆'
-              break
-            case 'shop':
-              buildNmae = '京喜商店'
-              break
-            case 'fun':
-              buildNmae = '京喜游乐场'
-            default:
-              break
-          }
-          console.log(`收金币`)
-          const body = `strBuildIndex=${data.strBuildIndex}&dwType=1`
-          let collectCoinRes = await collectCoin(body)
-          console.log(`【${buildNmae}】收集${collectCoinRes.ddwCoin}金币`)
-          await $.wait(2000)
-          await getUserInfo(false)
-          console.log(`建筑升级`)
-          console.log(`【${buildNmae}】升级需要${data.ddwNextLvlCostCoin}金币，当前拥有${$.info.ddwCoinBalance}`)
-          if(data.dwCanLvlUp === 1 && $.info.ddwCoinBalance >= data.ddwNextLvlCostCoin) {
-            console.log(`【${buildNmae}】满足升级条件，开始升级`)
-            const body = `ddwCostCoin=${data.ddwNextLvlCostCoin}&strBuildIndex=${data.strBuildIndex}`
-            let buildLvlUpRes = await buildLvlUp(body)
-            if (buildLvlUpRes.iRet === 0) {
-              console.log(`【${buildNmae}】升级成功\n`)
-            } else {
-              console.log(`${buildLvlUpRes}\n`)
+          if (type) {
+            let buildNmae;
+            switch(strBuildIndex) {
+              case 'food':
+                buildNmae = '京喜美食城'
+                break
+              case 'sea':
+                buildNmae = '京喜旅馆'
+                break
+              case 'shop':
+                buildNmae = '京喜商店'
+                break
+              case 'fun':
+                buildNmae = '京喜游乐场'
+              default:
+                break
+            }
+            // console.log(data)
+            if (data.dwBuildLvl === 0) {
+              console.log(`创建建筑`)
+              console.log(`【${buildNmae}】当前建筑还未创建，开始创建`)
+              await createbuilding(`strBuildIndex=${data.strBuildIndex}`, buildNmae)
+              await $.wait(2000)
+              data = await getBuildInfo(twobody, strBuildIndex, false)
               await $.wait(2000)
             }
-          } else {
-            console.log(`【${buildNmae}】不满足升级条件，跳过升级\n`)
+            console.log(`收金币`)
+            const body = `strBuildIndex=${data.strBuildIndex}&dwType=1`
+            let collectCoinRes = await collectCoin(body)
+            console.log(`【${buildNmae}】收集${collectCoinRes.ddwCoin}金币`)
+            await $.wait(2000)
+            await getUserInfo(false)
+            console.log(`升级建筑`)
+            console.log(`【${buildNmae}】升级需要${data.ddwNextLvlCostCoin}金币，当前拥有${$.info.ddwCoinBalance}`)
+            if(data.dwCanLvlUp === 1 && $.info.ddwCoinBalance >= data.ddwNextLvlCostCoin) {
+              console.log(`【${buildNmae}】满足升级条件，开始升级`)
+              const body = `ddwCostCoin=${data.ddwNextLvlCostCoin}&strBuildIndex=${data.strBuildIndex}`
+              let buildLvlUpRes = await buildLvlUp(body)
+              if (buildLvlUpRes.iRet === 0) {
+                console.log(`【${buildNmae}】升级成功\n`)
+              } else {
+                console.log(`${buildLvlUpRes}\n`)
+                await $.wait(2000)
+              }
+            } else {
+              console.log(`【${buildNmae}】不满足升级条件，跳过升级\n`)
+            }
           }
         }
       } catch (e) {
         $.logErr(e, resp);
       } finally {
-        resolve();
+        resolve(data);
       }
     })
   })
@@ -682,6 +705,25 @@ function buildLvlUp(body) {
     })
   })
 }
+function createbuilding(body, buildNmae) {
+  return new Promise(async (resolve) => {
+    $.get(taskUrl(`user/createbuilding`, body), (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} createbuilding API请求失败，请检查网路重试`)
+        } else {
+          data = JSON.parse(data);
+          if (data.iRet === 0) console.log(`【${buildNmae}】创建成功`)
+        }
+      } catch (e) {
+        $.logErr(e, resp);
+      } finally {
+        resolve();
+      }
+    })
+  })
+}
 
 // 助力
 function helpByStage(shareCodes) {
@@ -703,7 +745,7 @@ function helpByStage(shareCodes) {
             $.canHelp = false
           } else if (data.iRet === 2229 || data.sErrMsg === '助力失败啦~') {
             console.log(data.sErrMsg)
-            $.canHelp = false
+            // $.canHelp = false
           } else {
             console.log(data.sErrMsg)
           }
@@ -1057,7 +1099,7 @@ function biz(contents){
   })
 }
 
-function taskUrl(function_path, body) {
+function taskUrl(function_path, body = '') {
   let url = `${JD_API_HOST}jxbfd/${function_path}?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=138631.26.55&${body}&_stk=_cfd_t%2CbizCode%2CddwTaskId%2CdwEnv%2Cptag%2Csource%2CstrShareId%2CstrZone&_ste=1`;
   url += `&h5st=${decrypt(Date.now(), '', '', url)}&_=${Date.now() + 2}&sceneval=2&g_login_type=1&g_ty=ls`;
   return {
@@ -1076,7 +1118,7 @@ function taskUrl(function_path, body) {
   };
 }
 
-function taskListUrl(function_path, body, bizCode = 'jxbfd') {
+function taskListUrl(function_path, body = '', bizCode = 'jxbfd') {
   let url = `${JD_API_HOST}newtasksys/newtasksys_front/${function_path}?strZone=jxbfd&bizCode=${bizCode}&source=jxbfd&dwEnv=7&_cfd_t=${Date.now()}&ptag=138631.26.55&${body}&_stk=_cfd_t%2CbizCode%2CconfigExtra%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1`;
   url += `&h5st=${decrypt(Date.now(), '', '', url)}&_=${Date.now() + 2}&sceneval=2&g_login_type=1&g_ty=ls`;
   return {
