@@ -58,11 +58,11 @@ $.appId = 10028;
   $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
   await requestAlgo();
   await $.wait(1000)
-  let res = await getAuthorShareCode('')
+  let res = await getAuthorShareCode('https://raw.githubusercontent.com/Aaron-lv/updateTeam/master/shareCodes/cfd.json')
   if (!res) {
-    $.http.get({url: ''}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
+    $.http.get({url: 'https://purge.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json'}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
     await $.wait(1000)
-    res = await getAuthorShareCode('')
+    res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json')
   }
   $.strMyShareIds = [...(res && res.shareId || [])]
   for (let i = 0; i < cookiesArr.length; i++) {
@@ -160,7 +160,7 @@ async function cfd() {
     for(let key of Object.keys($.info.buildInfo.buildList)) {
       let vo = $.info.buildInfo.buildList[key]
       let body = `strBuildIndex=${vo.strBuildIndex}`
-      await getBuildInfo(body, vo.strBuildIndex)
+      await getBuildInfo(body, vo)
       await $.wait(1000)
     }
 
@@ -379,7 +379,11 @@ function helpdraw(dwUserId) {
         } else {
           data = JSON.parse(data);
           if (data.iRet === 0 || data.sErrMsg === "success") {
-            console.log(`领取助力奖励成功：获得${data.Data.ddwCoin}金币`)
+            if (data.Data.StagePrizeInfo) {
+              console.log(`领取助力奖励成功：获得${data.Data.ddwCoin}金币 ${data.Data.StagePrizeInfo.ddwMoney}财富 ${data.Data.StagePrizeInfo.strPrizeName}红包`)
+            } else {
+              console.log(`领取助力奖励成功：获得${data.Data.ddwCoin}金币`)
+            }
           } else {
             console.log(`领取助力奖励失败：${data.sErrMsg}`)
           }
@@ -602,7 +606,7 @@ function employTourGuide(body, buildNmae) {
 }
 
 // 升级建筑
-async function getBuildInfo(body, strBuildIndex, type = true) {
+async function getBuildInfo(body, buildList, type = true) {
   let twobody = body
   return new Promise(async (resolve) => {
     $.get(taskUrl(`user/GetBuildInfo`, body), async (err, resp, data) => {
@@ -614,7 +618,7 @@ async function getBuildInfo(body, strBuildIndex, type = true) {
           data = JSON.parse(data);
           if (type) {
             let buildNmae;
-            switch(strBuildIndex) {
+            switch(buildList.strBuildIndex) {
               case 'food':
                 buildNmae = '京喜美食城'
                 break
@@ -635,7 +639,7 @@ async function getBuildInfo(body, strBuildIndex, type = true) {
               console.log(`【${buildNmae}】当前建筑还未创建，开始创建`)
               await createbuilding(`strBuildIndex=${data.strBuildIndex}`, buildNmae)
               await $.wait(2000)
-              data = await getBuildInfo(twobody, strBuildIndex, false)
+              data = await getBuildInfo(twobody, buildList, false)
               await $.wait(2000)
             }
             console.log(`收金币`)
@@ -645,8 +649,9 @@ async function getBuildInfo(body, strBuildIndex, type = true) {
             await $.wait(2000)
             await getUserInfo(false)
             console.log(`升级建筑`)
+            console.log(`【${buildNmae}】当前等级：${buildList.dwLvl} 升级获得财富：${data.ddwLvlRich}`)
             console.log(`【${buildNmae}】升级需要${data.ddwNextLvlCostCoin}金币，当前拥有${$.info.ddwCoinBalance}`)
-            if(data.dwCanLvlUp === 1 && $.info.ddwCoinBalance >= data.ddwNextLvlCostCoin) {
+            if(data.dwCanLvlUp > 0 && $.info.ddwCoinBalance >= data.ddwNextLvlCostCoin) {
               console.log(`【${buildNmae}】满足升级条件，开始升级`)
               const body = `ddwCostCoin=${data.ddwNextLvlCostCoin}&strBuildIndex=${data.strBuildIndex}`
               let buildLvlUpRes = await buildLvlUp(body)
@@ -991,7 +996,7 @@ function awardTask(taskType, taskinfo) {
               if (msg.indexOf('活动太火爆了') !== -1) {
                 str = '任务为成就任务或者未到任务时间';
               } else {
-                str = msg + prizeInfo ? ` 获得金币 ¥ ${JSON.parse(prizeInfo).ddwCoin}` : '';
+                str = msg + prizeInfo ? `获得金币 ¥ ${JSON.parse(prizeInfo).ddwCoin}` : '';
               }
               console.log(`【领日常奖励】${taskName} ${str}\n${$.showLog ? data : ''}`);
             }
