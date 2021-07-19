@@ -234,13 +234,13 @@ function shareCodesFormat() {
   return new Promise(async resolve => {
     $.newShareCodes = [];
     let inviteCodes = [
-      't_7LVGP8mopofh8AG0Q7E8AdoUJQ3Dik@zExA7lNc3HrJrbVuG3xRVMAdoUJQ3Dik@cvwWiz9o2evNHFdNk0oNbMAdoUJQ3Dik@8MQ6wrd9H0IAujNGUqzTAA',
-      't_7LVGP8mopofh8AG0Q7E8AdoUJQ3Dik@zExA7lNc3HrJrbVuG3xRVMAdoUJQ3Dik@cvwWiz9o2evNHFdNk0oNbMAdoUJQ3Dik@8MQ6wrd9H0IAujNGUqzTAA'
+      'QxxG-5q643cplxf07wV9lcAdoUJQ3Dik@QBKRzwsUCvsYytkTsKrkMw@AVY3sTK08eagKu0_jyDj7Q@JmCwyhWMc85io5yXaR9dog',
+      'Q8Au6-8Ya1zmHJe2V3SxEsAdoUJQ3Dik@MnpxH8Tq5uSFtW2pooz4hMAdoUJQ3Dik@nAx3W3DAnCh9xNF0Dqjb4cAdoUJQ3Dik@VJ9TlR1bgTv9a3xGOaOcL8NIFD4KvkF_'
     ];
     if ($.shareCodesArr[$.index - 1]) {
       $.newShareCodes = $.shareCodesArr[$.index - 1].split('@');
     } else {
-      console.log(`由于您第${$.index}个京东账号未提供shareCode,将为本脚本作者【zero205】助力\n`)
+      console.log(`由于您第${$.index}个京东账号未提供shareCode,将互相助力\n`)
       const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
       $.newShareCodes = inviteCodes[tempIndex].split('@');
     }
