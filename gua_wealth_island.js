@@ -55,13 +55,13 @@ $.appId = 10032;
 `)
   await requestAlgo();
   for (let i = 0; i < cookiesArr.length; i++) {
-    if (cookiesArr[i]) {
-      UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};      
+    if (cookiesArr[i]) {      
       $.cookie = cookiesArr[i] + '';
       $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
       $.index = i + 1;
       $.isLogin = true;
       console.log(`\n*****开始【京东账号${$.index}】${$.UserName}****\n`);
+      UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};
       await run();
     }
   }
@@ -368,7 +368,7 @@ async function sign(){
     
     if($.Aggrtask && $.Aggrtask.Data && $.Aggrtask.Data.Employee && $.Aggrtask.Data.Employee.EmployeeList){
         if($.Aggrtask.Data && $.Aggrtask.Data.Employee && $.Aggrtask.Data.Employee.EmployeeList){
-        console.log(`\n领取邀请奖励`)
+        console.log(`\n领取邀请奖励(${$.Aggrtask.Data.Employee.EmployeeList.length || 0}/${$.Aggrtask.Data.Employee.dwNeedTotalPeople || 0})`)
         for(let i of $.Aggrtask.Data.Employee.EmployeeList){
           if(i.dwStatus == 0){
             let res = await taskGet(`story/helpdraw`, '_cfd_t,bizCode,dwEnv,dwUserId,ptag,source,strZone', `&ptag=&dwUserId=${i.dwId}`)
