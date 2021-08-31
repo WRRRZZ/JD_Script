@@ -13,17 +13,17 @@ const $ = new Env('财富大陆');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 // const notify = $.isNode() ? require('./sendNotify') : '';
 $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
-let UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};`
+let UA = `jdpingou;iPhone;5.2.2;14.3;${randomString(40)};network/wifi;model/iPhone12,1;appBuild/100630;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/1;pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
 function randomString(e) {
   e = e || 32;
-  let t = "abcdefhijkmnprstwxyz2345678", a = t.length, n = "";
+  let t = "abcdef0123456789", a = t.length, n = "";
   for (i = 0; i < e; i++)
     n += t.charAt(Math.floor(Math.random() * a));
   return n
 }
 $.InviteList = []
 $.innerInviteList = [];
-const HelpAuthorFlag = false;//是否助力作者SH  true 助力，false 不助力
+const HelpAuthorFlag = true;//是否助力作者SH  true 助力，false 不助力
 
 // 热气球接客 每次运行接客次数
 let serviceNum = 10;// 每次运行接客次数
@@ -61,42 +61,8 @@ $.appId = 10032;
       $.index = i + 1;
       $.isLogin = true;
       console.log(`\n*****开始【京东账号${$.index}】${$.UserName}****\n`);
-      UA = `jdapp;iPhone;10.0.5;${Math.ceil(Math.random()*2+12)}.${Math.ceil(Math.random()*4)};${randomString(40)};`
+      UA = `jdpingou;iPhone;5.2.2;14.3;${randomString(40)};network/wifi;model/iPhone12,1;appBuild/100630;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/1;pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
       await run();
-    }
-  }
-    // 助力
-  let res = [], res2 = [];
-  $.InviteLists = []
-  if (HelpAuthorFlag) {
-    $.innerInviteList = await getAuthorShareCode('');
-    res2 = await getAuthorShareCode('');
-    $.innerInviteLists = getRandomArrayElements([...res, ...res2], [...res, ...res2].length);
-    $.InviteLists.push(...$.InviteList,...$.innerInviteList,...$.innerInviteLists);
-  }else{
-    $.InviteLists.push(...$.InviteList);
-  }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    $.cookie = cookiesArr[i];
-    $.canHelp = true;
-    $.UserName = decodeURIComponent($.cookie.match(/pt_pin=([^; ]+)(?=;?)/) && $.cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
-    $.index = i + 1;
-    if ($.InviteLists && $.InviteLists.length) console.log(`\n******开始【邀请好友助力】*********\n`);
-    for (let j = 0; j < $.InviteLists.length && $.canHelp; j++) {
-      $.inviteId = $.InviteLists[j];
-      console.log(`${$.UserName} 助力 ${$.inviteId}`);
-      let res = await taskGet(`story/helpbystage`, '_cfd_t,bizCode,dwEnv,ptag,source,strShareId,strZone', `&strShareId=${$.inviteId}`)
-      if(res && res.iRet == 0){
-        console.log(`助力成功: 获得${res.Data && res.Data.GuestPrizeInfo && res.Data.GuestPrizeInfo.strPrizeName || ''}`)
-      }else if(res && res.sErrMsg){
-        console.log(res.sErrMsg)
-        if(res.sErrMsg.indexOf('助力次数达到上限') > -1 || res.iRet === 2232 || res.sErrMsg.indexOf('助力失败') > -1){
-          break
-        }
-      }else{
-        console.log(JSON.stringify(res))
-      }
-      await $.wait(1000);
     }
   }
 })()
@@ -158,8 +124,9 @@ async function run() {
   }
 }
 async function GetHomePageInfo() {
-  let additional= `&ddwTaskId&strShareId&strMarkList=guider_step%2Ccollect_coin_auth%2Cguider_medal%2Cguider_over_flag%2Cbuild_food_full%2Cbuild_sea_full%2Cbuild_shop_full%2Cbuild_fun_full%2Cmedal_guider_show%2Cguide_guider_show%2Cguide_receive_vistor`
-  let stk= `_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strMarkList,strShareId,strZone`
+  let e = getJxAppToken()
+  let additional= `&strPgtimestamp=${e.strPgtimestamp}&strPhoneID=${e.strPhoneID}&strPgUUNum=${e.strPgUUNum}&ddwTaskId=&strShareId=&strMarkList=guider_step%2Ccollect_coin_auth%2Cguider_medal%2Cguider_over_flag%2Cbuild_food_full%2Cbuild_sea_full%2Cbuild_shop_full%2Cbuild_fun_full%2Cmedal_guider_show%2Cguide_guider_show%2Cguide_receive_vistor%2Cdaily_task%2Cguider_daily_task%2Ccfd_has_show_selef_point`
+  let stk= `_cfd_t,bizCode,ddwTaskId,dwEnv,ptag,source,strMarkList,strPgUUNum,strPgtimestamp,strPhoneID,strShareId,strVersion,strZone`
   $.HomeInfo = await taskGet(`user/QueryUserInfo`, stk, additional)
   if($.HomeInfo){
     $.Fund = $.HomeInfo.Fund || ''
@@ -360,8 +327,9 @@ async function sign(){
           }
         }
         if(flag){
-          let additional = `&ptag=&ddwCoin=${ddwCoin}&ddwMoney=${ddwMoney}&dwPrizeType=${dwPrizeType}&strPrizePool${strPrizePool && '='+strPrizePool ||''}&dwPrizeLv=${dwPrizeLv}`
-          let stk= `_cfd_t,bizCode,ddwCoin,ddwMoney,dwEnv,dwPrizeLv,dwPrizeType,ptag,source,strPrizePool,strZone`
+          let e = getJxAppToken()
+          let additional = `&ptag=&ddwCoin=${ddwCoin}&ddwMoney=${ddwMoney}&dwPrizeType=${dwPrizeType}&strPrizePool${strPrizePool && '='+strPrizePool ||''}&dwPrizeLv=${dwPrizeLv}&strPgtimestamp=${e.strPgtimestamp}&strPhoneID=${e.strPhoneID}&strPgUUNum=${e.strPgUUNum}`
+          let stk= `_cfd_t,bizCode,ddwCoin,ddwMoney,dwEnv,dwPrizeLv,dwPrizeType,ptag,source,strPrizePool,strPgUUNum,strPgtimestamp,strPhoneID,strZone`
           let res = await taskGet(`story/RewardSign`, stk, additional)
           await printRes(res, '签到')
         }
@@ -637,14 +605,12 @@ async function ActTask(){
         }
         if(item.dwAwardStatus == 2 && item.dwCompleteNum < item.dwTargetNum && [1,2].includes(item.dwOrderId)){
           await $.wait(1000)
-          if(item.dwOrderId == 2){
-            if(item.strTaskName.indexOf('热气球接待') > -1){
-              let b = (item.dwTargetNum-item.dwCompleteNum)
-              // 热气球接客
-              await service(b)
-              await $.wait((Number(item.dwLookTime) * 1000) || 1000)
-            }
-          }else if(item.dwOrderId == 1){
+          if(item.strTaskName.indexOf('热气球接待') > -1){
+            let b = (item.dwTargetNum-item.dwCompleteNum)
+            // 热气球接客
+            await service(b)
+            await $.wait((Number(item.dwLookTime) * 1000) || 1000)
+          }else if(item.dwPointType == 301){
             await $.wait((Number(item.dwLookTime) * 1000) || 1000)
             res = await taskGet('DoTask1', '_cfd_t,bizCode,configExtra,dwEnv,ptag,source,strZone,taskId', `&ptag=&taskId=${item.ddwTaskId}&configExtra=`)
           }
@@ -756,6 +722,23 @@ function printRes(res, msg=''){
     console.log(`${msg}失败:${res.sErrMsg}`)
   }else{
     console.log(`${msg}失败:${JSON.stringify(res)}`)
+  }
+}
+function getJxAppToken(){
+  function generateStr(e) {
+    e = e || 32;
+    let t = "abcdefghijklmnopqrstuvwxyz1234567890", a = t.length, n = "";
+    for (i = 0; i < e; i++)
+      n += t.charAt(Math.floor(Math.random() * a));
+    return n
+  }
+  let phoneId = generateStr(40);
+  let timestamp = Date.now().toString();
+  let pgUUNum = $.CryptoJS.MD5('' + decodeURIComponent($.UserName || '') + timestamp + phoneId + 'tPOamqCuk9NLgVPAljUyIHcPRmKlVxDy').toString($.CryptoJS.enc.MD5);
+  return {
+    'strPgtimestamp': timestamp,
+    'strPhoneID': phoneId,
+    'strPgUUNum': pgUUNum
   }
 }
 async function noviceTask(){
