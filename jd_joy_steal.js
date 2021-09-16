@@ -1,7 +1,7 @@
 /*
 Last Modified time: 2021-6-6 10:22:37
 活动入口：京东APP我的-更多工具-宠汪汪
-最近经常出现给偷好友积分与狗粮失败的情况，故建议cron设置为多次
+最近经常出现给偷好友积分与狗粮失败的情况，故建议cron设置为多次RtKLB8euDo7KwsO0
 jd宠汪汪偷好友积分与狗粮,及给好友喂食
 偷好友积分上限是20个好友(即获得100积分)，帮好友喂食上限是20个好友(即获得200积分)，偷好友狗粮上限也是20个好友(最多获得120g狗粮)
 IOS用户支持京东双账号,NodeJs用户支持N个京东账号
@@ -45,7 +45,7 @@ let jdNotify = false;//是否开启静默运行，false关闭静默运行(即通
 let jdJoyHelpFeed = true;//是否给好友喂食，false为不给喂食，true为给好友喂食，默认给好友喂食
 let jdJoyStealCoin = true;//是否偷好友积分与狗粮，false为否，true为是，默认是偷
 let JD_API_HOST = 'https://jdjoy.jd.com'
-$.invokeKey = 'RtKLB8euDo7KwsO0'
+$.invokeKey = 'JL1VTNRadM68cIMQ'
 let lkt = 0
 if(process.env.JOY_HOST){
   JD_API_HOST = process.env.JOY_HOST
