@@ -341,7 +341,7 @@ async function rewardBean(){
     let lkt = new Date().getTime()
     let lks = $.md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
     let options = {
-      "url": `https://draw.jdfcloud.com/common/api/bean/activity/sendBean?rewardRecordId=${$.rewardRecordId}&jdChannelId=&userSource=mp&appId=wxccb5c536b0ecd1bf&invokeKey=JL1VTNRadM68cIMQ`,
+      "url": `https://draw.jdfcloud.com/common/api/bean/activity/sendBean?rewardRecordId=${$.rewardRecordId}&jdChannelId=&userSource=mp&appId=wxccb5c536b0ecd1bf&invokeKey=q8DNJdpcfRQ69gIx`,
       "headers":  {
         'content-type' : `application/json`,
         'Connection' : `keep-alive`,
@@ -390,7 +390,7 @@ async function help() {
     let lkt = new Date().getTime()
     let lks = $.md5('' + 'q8DNJdpcfRQ69gIx' + lkt + $.activityCode).toString()
     let options = {
-      "url": `https://draw.jdfcloud.com/common/api/bean/activity/participate?activityCode=${$.activityCode}&activityId=${$.activityId}&inviteUserPin=${encodeURIComponent($.oneTuanInfo['user'])}&invokeKey=JL1VTNRadM68cIMQ&timestap=${Date.now()}`,
+      "url": `https://draw.jdfcloud.com/common/api/bean/activity/participate?activityCode=${$.activityCode}&activityId=${$.activityId}&inviteUserPin=${encodeURIComponent($.oneTuanInfo['user'])}&invokeKey=q8DNJdpcfRQ69gIx&timestap=${Date.now()}`,
       "headers":  {
         'content-type' : `application/json`,
         'Connection' : `keep-alive`,
@@ -429,7 +429,7 @@ async function help() {
 async function invite() {
   let lkt = new Date().getTime()
   let lks = $.md5('' + 'q8DNJdpcfRQ69gIx' + lkt + $.activityCode).toString()
-  const url = `https://draw.jdfcloud.com/common/api/bean/activity/invite?activityCode=${$.activityCode}&openId=&activityId=${$.activityId}&userSource=mp&formId=123&jdChannelId=&fp=&appId=wxccb5c536b0ecd1bf&invokeKey=JL1VTNRadM68cIMQ`;
+  const url = `https://draw.jdfcloud.com/common/api/bean/activity/invite?activityCode=${$.activityCode}&openId=&activityId=${$.activityId}&userSource=mp&formId=123&jdChannelId=&fp=&appId=wxccb5c536b0ecd1bf&invokeKey=q8DNJdpcfRQ69gIx`;
   const method = `POST`;
   const headers = {
     'content-type' : `application/json`,
@@ -474,7 +474,7 @@ async function invite() {
 async function getActivityDetail() {
   let lkt = new Date().getTime()
   let lks = $.md5('' + 'q8DNJdpcfRQ69gIx' + lkt + $.activityCode).toString()
-  const url = `https://draw.jdfcloud.com/common/api/bean/activity/detail?activityCode=${$.activityCode}&activityId=${$.activityId}&userOpenId=&timestap=${Date.now()}&userSource=mp&jdChannelId=&appId=wxccb5c536b0ecd1bf&invokeKey=JL1VTNRadM68cIMQ`;
+  const url = `https://draw.jdfcloud.com/common/api/bean/activity/detail?activityCode=${$.activityCode}&activityId=${$.activityId}&userOpenId=&timestap=${Date.now()}&userSource=mp&jdChannelId=&appId=wxccb5c536b0ecd1bf&invokeKey=q8DNJdpcfRQ69gIx`;
   const method = `GET`;
   const headers = {
     'cookie' : $.cookie,
